@@ -1,27 +1,220 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+      "Helvetica Neue", sans-serif;
+  }
+  code,
+  pre,
+  .font-mono {
+    font-family: "Fira Code", "Roboto Mono", monospace;
+  }
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+main {
+  position: relative;
+  z-index: 0;
+}
+
+main::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('/images/Noise.png');
+  background-repeat: repeat;
+  opacity: 0.65; 
+  pointer-events: none;
+}
+
+/* V0-style code editor */
+.v0-editor {
+  @apply font-mono text-sm leading-relaxed;
+  background-color: #151515;
+  color: #d4d4d4;
+}
+
+.v0-editor .token.comment {
+  color: #6a9955;
+}
+
+.v0-editor .token.property,
+.v0-editor .token.tag,
+.v0-editor .token.boolean,
+.v0-editor .token.number,
+.v0-editor .token.constant,
+.v0-editor .token.symbol {
+  color: #b5cea8;
+}
+
+.v0-editor .token.selector,
+.v0-editor .token.attr-name,
+.v0-editor .token.string,
+.v0-editor .token.char,
+.v0-editor .token.builtin {
+  color: #ce9178;
+}
+
+.v0-editor .token.operator,
+.v0-editor .token.entity,
+.v0-editor .token.url,
+.v0-editor .token.variable {
+  color: #d4d4d4;
+}
+
+.v0-editor .token.atrule,
+.v0-editor .token.attr-value,
+.v0-editor .token.keyword {
+  color: #569cd6;
+}
+
+.v0-editor .token.function {
+  color: #dcdcaa;
+}
+
+.v0-editor .token.regex,
+.v0-editor .token.important {
+  color: #d16969;
+}
+
+.v0-editor .token.important,
+.v0-editor .token.bold {
+  font-weight: bold;
+}
+
+.v0-editor .token.italic {
+  font-style: italic;
+}
+
+.v0-editor .token.punctuation {
+  color: #d4d4d4;
+}
+
+/* Transition animations */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Custom scrollbar for code editors */
+.v0-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.v0-scrollbar::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+.v0-scrollbar::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+.v0-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+/* Line numbers for code editor */
+.line-numbers {
+  counter-reset: line;
+  position: relative;
+}
+
+.line-numbers > div {
+  position: relative;
+  padding-left: 3.5em;
+}
+
+.line-numbers > div:before {
+  counter-increment: line;
+  content: counter(line);
+  position: absolute;
+  left: 0;
+  color: #858585;
+  text-align: right;
+  width: 2.5em;
+  padding-right: 0.5em;
 }
