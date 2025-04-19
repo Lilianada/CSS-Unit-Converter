@@ -5,6 +5,7 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
+import Script from "next/script";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -40,6 +41,19 @@ export default function RootLayout({
             <Footer />
           </main>
         </ThemeProvider>
+        <Script
+          data-name="BMC-Widget" 
+          data-cfasync="false" 
+          src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" 
+          data-id="Lilian.ada" 
+          data-description="Support me on Buy me a coffee!" 
+          data-message="Hiiiii❤️, thank you for checking out this website.You can now support work by buying me a cup of coffee☕️" 
+          data-color="#BD5FFF" 
+          data-position="Right" 
+          data-x_margin="18" 
+          data-y_margin="18"
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );
