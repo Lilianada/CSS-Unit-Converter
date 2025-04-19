@@ -9,8 +9,13 @@ import { Copy, Check } from "lucide-react"
 import { motion } from "framer-motion"
 import CodeEditor from "@/components/code-editor"
 
-type CssUnit = "px" | "em" | "rem" | "%" | "vh" | "vw" | "vmin" | "vmax" | "pt" | "pc" | "in" | "cm" | "mm"
-
+  // Define type for CSS units
+  type CssUnit = 
+    | "px" | "em" | "rem" | "%" 
+    | "vh" | "vw" | "vmin" | "vmax" 
+    | "pt" | "pc" | "in" | "cm" | "mm" | "q"
+    | "ex" | "ch";
+    
 const CssCodeConverter = () => {
   const [cssCode, setCssCode] = useState<string>("")
   const [convertedCode, setConvertedCode] = useState<string>("")
@@ -44,102 +49,163 @@ const CssCodeConverter = () => {
     })
   }
 
-  const convertValue = (value: number, from: CssUnit, to: CssUnit): string => {
+  const convertValue = (value: number, from: CssUnit, to: CssUnit, context: {
+    rootFontSize?: number;           // Browser default is typically 16px
+    parentFontSize?: number;         // For em calculations
+    targetElementWidth?: number;     // For % calculations when dealing with width
+    targetElementHeight?: number;    // For % calculations when dealing with height
+    propertyType?: 'width' | 'height' | 'font-size' | 'other'; // Context of what we're converting
+  } = {}): string => {
+    // Set defaults
+    const rootFontSize = context.rootFontSize || 16;
+    const parentFontSize = context.parentFontSize || rootFontSize;
+    const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1920; // Default to common width
+    const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 1080; // Default to common height
+    
     // First convert to pixels as a base unit
-    let valueInPx = value
-
+    let valueInPx = value;
+    
     switch (from) {
+      case "px":
+        valueInPx = value;
+        break;
       case "em":
-        valueInPx = value * rootFontSize
-        break
+        valueInPx = value * parentFontSize;
+        break;
       case "rem":
-        valueInPx = value * rootFontSize
-        break
+        valueInPx = value * rootFontSize;
+        break;
       case "%":
-        valueInPx = (value / 100) * rootFontSize
-        break
+        // Percentages are contextual
+        if (context.propertyType === 'width' && context.targetElementWidth) {
+          valueInPx = (value / 100) * context.targetElementWidth;
+        } else if (context.propertyType === 'height' && context.targetElementHeight) {
+          valueInPx = (value / 100) * context.targetElementHeight;
+        } else if (context.propertyType === 'font-size') {
+          valueInPx = (value / 100) * parentFontSize;
+        } else {
+          // Default behavior - assume it's relative to parent font size
+          valueInPx = (value / 100) * parentFontSize;
+        }
+        break;
       case "vh":
-        valueInPx = (value / 100) * window.innerHeight
-        break
+        valueInPx = (value / 100) * viewportHeight;
+        break;
       case "vw":
-        valueInPx = (value / 100) * window.innerWidth
-        break
+        valueInPx = (value / 100) * viewportWidth;
+        break;
       case "vmin":
-        valueInPx = (value / 100) * Math.min(window.innerWidth, window.innerHeight)
-        break
+        valueInPx = (value / 100) * Math.min(viewportWidth, viewportHeight);
+        break;
       case "vmax":
-        valueInPx = (value / 100) * Math.max(window.innerWidth, window.innerHeight)
-        break
+        valueInPx = (value / 100) * Math.max(viewportWidth, viewportHeight);
+        break;
       case "pt":
-        valueInPx = value * 1.33333
-        break
+        valueInPx = value * (96 / 72); // 1pt = 1/72 inch, and 1 inch = 96px
+        break;
       case "pc":
-        valueInPx = value * 16
-        break
+        valueInPx = value * (96 / 6); // 1pc = 1/6 inch, and 1 inch = 96px
+        break;
       case "in":
-        valueInPx = value * 96
-        break
+        valueInPx = value * 96; // 1in = 96px by CSS standard
+        break;
       case "cm":
-        valueInPx = value * 37.795
-        break
+        valueInPx = value * (96 / 2.54); // 1cm = 96px/2.54
+        break;
       case "mm":
-        valueInPx = value * 3.7795
-        break
+        valueInPx = value * (96 / 25.4); // 1mm = 96px/25.4
+        break;
+      case "q":
+        valueInPx = value * (96 / 101.6); // 1q = 1/4mm = 96px/101.6
+        break;
+      case "ex":
+        valueInPx = value * (parentFontSize * 0.5); // Approximation: ex ≈ 0.5em
+        break;
+      case "ch":
+        valueInPx = value * (parentFontSize * 0.5); // Approximation: ch ≈ 0.5em
+        break;
     }
-
+    
     // Then convert from pixels to the target unit
-    let convertedValue: number
-
+    let convertedValue: number;
+    
     switch (to) {
       case "px":
-        convertedValue = valueInPx
-        break
+        convertedValue = valueInPx;
+        break;
       case "em":
-        convertedValue = valueInPx / rootFontSize
-        break
+        convertedValue = valueInPx / parentFontSize;
+        break;
       case "rem":
-        convertedValue = valueInPx / rootFontSize
-        break
+        convertedValue = valueInPx / rootFontSize;
+        break;
       case "%":
-        convertedValue = (valueInPx / rootFontSize) * 100
-        break
+        // Percentages are contextual
+        if (context.propertyType === 'width' && context.targetElementWidth) {
+          convertedValue = (valueInPx / context.targetElementWidth) * 100;
+        } else if (context.propertyType === 'height' && context.targetElementHeight) {
+          convertedValue = (valueInPx / context.targetElementHeight) * 100;
+        } else if (context.propertyType === 'font-size') {
+          convertedValue = (valueInPx / parentFontSize) * 100;
+        } else {
+          // Default behavior - assume it's relative to parent font size
+          convertedValue = (valueInPx / parentFontSize) * 100;
+        }
+        break;
       case "vh":
-        convertedValue = (valueInPx / window.innerHeight) * 100
-        break
+        convertedValue = (valueInPx / viewportHeight) * 100;
+        break;
       case "vw":
-        convertedValue = (valueInPx / window.innerWidth) * 100
-        break
+        convertedValue = (valueInPx / viewportWidth) * 100;
+        break;
       case "vmin":
-        convertedValue = (valueInPx / Math.min(window.innerWidth, window.innerHeight)) * 100
-        break
+        convertedValue = (valueInPx / Math.min(viewportWidth, viewportHeight)) * 100;
+        break;
       case "vmax":
-        convertedValue = (valueInPx / Math.max(window.innerWidth, window.innerHeight)) * 100
-        break
+        convertedValue = (valueInPx / Math.max(viewportWidth, viewportHeight)) * 100;
+        break;
       case "pt":
-        convertedValue = valueInPx / 1.33333
-        break
+        convertedValue = valueInPx / (96 / 72);
+        break;
       case "pc":
-        convertedValue = valueInPx / 16
-        break
+        convertedValue = valueInPx / (96 / 6);
+        break;
       case "in":
-        convertedValue = valueInPx / 96
-        break
+        convertedValue = valueInPx / 96;
+        break;
       case "cm":
-        convertedValue = valueInPx / 37.795
-        break
+        convertedValue = valueInPx / (96 / 2.54);
+        break;
       case "mm":
-        convertedValue = valueInPx / 3.7795
-        break
+        convertedValue = valueInPx / (96 / 25.4);
+        break;
+      case "q":
+        convertedValue = valueInPx / (96 / 101.6);
+        break;
+      case "ex":
+        convertedValue = valueInPx / (parentFontSize * 0.5);
+        break;
+      case "ch":
+        convertedValue = valueInPx / (parentFontSize * 0.5);
+        break;
       default:
-        convertedValue = valueInPx
+        convertedValue = valueInPx;
     }
-
-    // Format the value with appropriate decimal places and remove trailing zeros
-    const formatted = convertedValue.toFixed(to === "px" || to === "pt" || to === "pc" ? 0 : 2)
-    // Remove trailing zeros and decimal point if not needed
-    return formatted.replace(/\.0+$/, "").replace(/(\.\d+?)0+$/, "$1")
-  }
-
+    
+    // Format the value with appropriate decimal places
+    let precision = 2;
+    if (to === "px" || to === "pt" || to === "pc") {
+      precision = 0;
+    } else if (to === "in" || to === "cm" || to === "mm" || to === "q") {
+      precision = 3;
+    }
+    
+    // Format the value and remove trailing zeros
+    const formatted = convertedValue.toFixed(precision);
+    return formatted.replace(/\.0+$/, "").replace(/(\.\d+?)0+$/, "$1");
+  };
+  
+  
   const handleCssCodeChange = (value: string) => {
     setCssCode(value)
   }
