@@ -5,7 +5,6 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
-import Script from "next/script";
 import { BuyMeCoffee } from "@/components/buy-me-coffee";
 
 const geistSans = localFont({
