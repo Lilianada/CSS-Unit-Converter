@@ -1,3 +1,4 @@
+
 const Footer = () => {
   return (
     <footer className="mt-auto py-6 border-t border-zinc-200 dark:border-zinc-800">
@@ -11,7 +12,7 @@ const Footer = () => {
             rel="noreferrer"
             className="font-medium underline underline-offset-4 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100"
           >
-            Lily's Lab
+            Lily&#39;s Lab
           </a>
           . The source code is available on{" "}
           <a

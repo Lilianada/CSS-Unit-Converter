@@ -22,7 +22,7 @@ const CssCodeConverter = () => {
   const [fromUnit, setFromUnit] = useState<CssUnit>("px")
   const [toUnit, setToUnit] = useState<CssUnit>("rem")
   const [copied, setCopied] = useState<boolean>(false)
-  const [rootFontSize, setRootFontSize] = useState<number>(16)
+  const [rootFontSize] = useState<number>(16)
 
   const units: CssUnit[] = ["px", "em", "rem", "%", "vh", "vw", "vmin", "vmax", "pt", "pc", "in", "cm", "mm"]
 

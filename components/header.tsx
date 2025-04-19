@@ -5,14 +5,6 @@ import { useState, useEffect } from "react"
 import { SquareCode, Sun, Moon, Info, MoreVertical } from "lucide-react"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import { motion } from "framer-motion"
 import Link from "next/link"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
