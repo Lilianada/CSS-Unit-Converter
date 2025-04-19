@@ -52,7 +52,7 @@ export default function CodeEditor({
 
   return (
     <div 
-      className="relative focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary/50 rounded-lg" 
+      className={`relative focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary/50 rounded-lg ${height}`} 
       onClick={handleContainerClick}
     >
       <pre
@@ -69,7 +69,7 @@ export default function CodeEditor({
         onChange={handleChange}
         placeholder={placeholder}
         readOnly={readOnly}
-        className={`v0-editor v0-scrollbar font-mono resize-none bg-transparent rounded-lg text-transparent absolute inset-0 ${height} p-3 ${className}`}
+        className={`v0-editor v0-scrollbar font-mono resize-none bg-transparent rounded-lg text-muted-foreground  absolute inset-0 ${height} p-3 ${className}`}
         style={{ caretColor: "white" }}
         aria-label={ariaLabel || "Code editor"}
         spellCheck="false"

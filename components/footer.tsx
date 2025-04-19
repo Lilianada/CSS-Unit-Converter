@@ -15,7 +15,7 @@ const Footer = () => {
           </a>
           . The source code is available on{" "}
           <a
-            href="https://github.com/lilianada/css-unit-converter"
+            href="https://github.com/lilianada/css-unit-converter/fork"
             target="_blank"
             rel="noreferrer"
             className="font-medium underline underline-offset-4 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-zinc-100"

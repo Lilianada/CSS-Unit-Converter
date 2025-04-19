@@ -104,8 +104,6 @@ main::before {
 /* V0-style code editor */
 .v0-editor {
   @apply font-mono text-sm leading-relaxed;
-  background-color: #151515;
-  color: #d4d4d4;
 }
 
 .v0-editor .token.comment {
