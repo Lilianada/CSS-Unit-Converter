@@ -85,7 +85,7 @@ export default function Header() {
                   className="flex items-center gap-2 px-3 py-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 cursor-pointer"
                 >
                   <SquareCode className="h-4 w-4" />
-                  {isCodeConverter ? "CSS Unit Converter" : "CSS Code Converter"}
+                  {isCodeConverter ? "Unit Converter" : "Code Converter"}
                 </Link>
               </DropdownMenu.Item>
               <DropdownMenu.Separator className="my-1 bg-zinc-200 dark:bg-zinc-800 h-px" />

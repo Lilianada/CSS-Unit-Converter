@@ -22,7 +22,7 @@ export default function AboutDialog({ open, onOpenChange, trigger }: AboutDialog
       <DialogContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
         <DialogHeader>
           <DialogTitle className="text-zinc-800 dark:text-zinc-200">About CSS Unit Converter</DialogTitle>
-          <DialogDescription className="text-zinc-600 dark:text-zinc-400 pt-4 space-y-3">
+          <DialogDescription className="text-zinc-600 dark:text-zinc-400 pt-4 space-y-3 text-left">
             <p>
               CSS Unit Converter is a tool designed to help web developers and designers easily convert between
               different CSS units.
