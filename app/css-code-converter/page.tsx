@@ -5,26 +5,61 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Copy, Check } from "lucide-react"
+import { Copy, Check, RotateCcw } from "lucide-react"
 import { motion } from "framer-motion"
 import CodeEditor from "@/components/code-editor"
 
-  // Define type for CSS units
-  type CssUnit = 
-    | "px" | "em" | "rem" | "%" 
-    | "vh" | "vw" | "vmin" | "vmax" 
-    | "pt" | "pc" | "in" | "cm" | "mm" | "q"
-    | "ex" | "ch";
-    
+type CssUnit = "px" | "em" | "rem" | "%" | "vh" | "vw" | "vmin" | "vmax" | "pt" | "pc" | "in" | "cm" | "mm"
+
+const DEFAULT_CSS_EXAMPLE = `/* Example CSS to demonstrate conversion */
+.container {
+  width: 1200px;
+  padding: 24px;
+  margin: 16px auto;
+  font-size: 16px;
+}
+
+.card {
+  width: 300px;
+  height: 200px;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 100vw;
+    padding: 16px;
+  }
+  
+  .card {
+    width: 100%;
+    height: 150px;
+  }
+}`
+
 const CssCodeConverter = () => {
   const [cssCode, setCssCode] = useState<string>("")
   const [convertedCode, setConvertedCode] = useState<string>("")
   const [fromUnit, setFromUnit] = useState<CssUnit>("px")
   const [toUnit, setToUnit] = useState<CssUnit>("rem")
-  const [copied, setCopied] = useState<boolean>(false)
+  const [copied, setCopied] = useState(false)
+  const [tried, setTried] = useState(false)
   const [rootFontSize] = useState<number>(16)
+  const [viewportSize, setViewportSize] = useState({ width: 1920, height: 1080 })
 
   const units: CssUnit[] = ["px", "em", "rem", "%", "vh", "vw", "vmin", "vmax", "pt", "pc", "in", "cm", "mm"]
+
+  useEffect(() => {
+    // Update viewport size on client
+    if (typeof window !== 'undefined') {
+      setViewportSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      })
+    }
+  }, [])
 
   useEffect(() => {
     if (cssCode) {
@@ -33,179 +68,78 @@ const CssCodeConverter = () => {
     } else {
       setConvertedCode("")
     }
-  }, [cssCode, fromUnit, toUnit, rootFontSize])
+  }, [cssCode, fromUnit, toUnit, rootFontSize, viewportSize])
+
+  const convertValue = (value: number, from: CssUnit, to: CssUnit): number => {
+    // First convert to pixels as a base unit
+    let valueInPx = value
+
+    switch (from) {
+      case "px": break
+      case "em":
+      case "rem": valueInPx = value * rootFontSize; break
+      case "%":
+        // Percentage conversion requires context - we'll assume it's relative to parent font size
+        valueInPx = (value / 100) * rootFontSize
+        break
+      case "vh": valueInPx = (value / 100) * viewportSize.height; break
+      case "vw": valueInPx = (value / 100) * viewportSize.width; break
+      case "vmin": valueInPx = (value / 100) * Math.min(viewportSize.width, viewportSize.height); break
+      case "vmax": valueInPx = (value / 100) * Math.max(viewportSize.width, viewportSize.height); break
+      case "pt": valueInPx = value * (96 / 72); break // 1pt = 1/72in, 1in = 96px
+      case "pc": valueInPx = value * 16; break // 1pc = 16px
+      case "in": valueInPx = value * 96; break // 1in = 96px
+      case "cm": valueInPx = value * (96 / 2.54); break // 1cm = 96px/2.54
+      case "mm": valueInPx = value * (96 / 25.4); break // 1mm = 96px/25.4
+    }
+
+    // Then convert from pixels to target unit
+    let convertedValue: number
+
+    switch (to) {
+      case "px": convertedValue = valueInPx; break
+      case "em":
+      case "rem": convertedValue = valueInPx / rootFontSize; break
+      case "%":
+        // Percentage conversion requires context - we'll assume it's relative to parent font size
+        convertedValue = (valueInPx / rootFontSize) * 100
+        break
+      case "vh": convertedValue = (valueInPx / viewportSize.height) * 100; break
+      case "vw": convertedValue = (valueInPx / viewportSize.width) * 100; break
+      case "vmin": convertedValue = (valueInPx / Math.min(viewportSize.width, viewportSize.height)) * 100; break
+      case "vmax": convertedValue = (valueInPx / Math.max(viewportSize.width, viewportSize.height)) * 100; break
+      case "pt": convertedValue = valueInPx / (96 / 72); break
+      case "pc": convertedValue = valueInPx / 16; break
+      case "in": convertedValue = valueInPx / 96; break
+      case "cm": convertedValue = valueInPx / (96 / 2.54); break
+      case "mm": convertedValue = valueInPx / (96 / 25.4); break
+    }
+
+    return convertedValue
+  }
 
   const convertCssCode = (code: string, from: CssUnit, to: CssUnit): string => {
     if (!code) return ""
 
-    // Regular expression to find CSS values with units
-    // This regex matches numbers followed by a unit
-    const regex = new RegExp(`(\\d*\\.?\\d+)${from}`, "g")
+    // Enhanced regex to match CSS values with units
+    const regex = new RegExp(`([-+]?\\d*\\.?\\d+)${from}(?![a-zA-Z0-9_-])`, "g")
 
     return code.replace(regex, (match, value) => {
-      const numericValue = Number.parseFloat(value)
+      const numericValue = parseFloat(value)
       const convertedValue = convertValue(numericValue, from, to)
-      return `${convertedValue}${to}`
+
+      // Format the value with appropriate decimal places
+      let precision = 4
+      if (to === "px" || to === "pt" || to === "pc") {
+        precision = 0
+      }
+
+      // Format and clean trailing zeros
+      const formatted = convertedValue.toFixed(precision)
+      return formatted.replace(/\.0+$/, "").replace(/(\.\d+?)0+$/, "$1") + to
     })
   }
 
-  const convertValue = (value: number, from: CssUnit, to: CssUnit, context: {
-    rootFontSize?: number;           // Browser default is typically 16px
-    parentFontSize?: number;         // For em calculations
-    targetElementWidth?: number;     // For % calculations when dealing with width
-    targetElementHeight?: number;    // For % calculations when dealing with height
-    propertyType?: 'width' | 'height' | 'font-size' | 'other'; // Context of what we're converting
-  } = {}): string => {
-    // Set defaults
-    const rootFontSize = context.rootFontSize || 16;
-    const parentFontSize = context.parentFontSize || rootFontSize;
-    const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1920; // Default to common width
-    const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 1080; // Default to common height
-    
-    // First convert to pixels as a base unit
-    let valueInPx = value;
-    
-    switch (from) {
-      case "px":
-        valueInPx = value;
-        break;
-      case "em":
-        valueInPx = value * parentFontSize;
-        break;
-      case "rem":
-        valueInPx = value * rootFontSize;
-        break;
-      case "%":
-        // Percentages are contextual
-        if (context.propertyType === 'width' && context.targetElementWidth) {
-          valueInPx = (value / 100) * context.targetElementWidth;
-        } else if (context.propertyType === 'height' && context.targetElementHeight) {
-          valueInPx = (value / 100) * context.targetElementHeight;
-        } else if (context.propertyType === 'font-size') {
-          valueInPx = (value / 100) * parentFontSize;
-        } else {
-          // Default behavior - assume it's relative to parent font size
-          valueInPx = (value / 100) * parentFontSize;
-        }
-        break;
-      case "vh":
-        valueInPx = (value / 100) * viewportHeight;
-        break;
-      case "vw":
-        valueInPx = (value / 100) * viewportWidth;
-        break;
-      case "vmin":
-        valueInPx = (value / 100) * Math.min(viewportWidth, viewportHeight);
-        break;
-      case "vmax":
-        valueInPx = (value / 100) * Math.max(viewportWidth, viewportHeight);
-        break;
-      case "pt":
-        valueInPx = value * (96 / 72); // 1pt = 1/72 inch, and 1 inch = 96px
-        break;
-      case "pc":
-        valueInPx = value * (96 / 6); // 1pc = 1/6 inch, and 1 inch = 96px
-        break;
-      case "in":
-        valueInPx = value * 96; // 1in = 96px by CSS standard
-        break;
-      case "cm":
-        valueInPx = value * (96 / 2.54); // 1cm = 96px/2.54
-        break;
-      case "mm":
-        valueInPx = value * (96 / 25.4); // 1mm = 96px/25.4
-        break;
-      case "q":
-        valueInPx = value * (96 / 101.6); // 1q = 1/4mm = 96px/101.6
-        break;
-      case "ex":
-        valueInPx = value * (parentFontSize * 0.5); // Approximation: ex ≈ 0.5em
-        break;
-      case "ch":
-        valueInPx = value * (parentFontSize * 0.5); // Approximation: ch ≈ 0.5em
-        break;
-    }
-    
-    // Then convert from pixels to the target unit
-    let convertedValue: number;
-    
-    switch (to) {
-      case "px":
-        convertedValue = valueInPx;
-        break;
-      case "em":
-        convertedValue = valueInPx / parentFontSize;
-        break;
-      case "rem":
-        convertedValue = valueInPx / rootFontSize;
-        break;
-      case "%":
-        // Percentages are contextual
-        if (context.propertyType === 'width' && context.targetElementWidth) {
-          convertedValue = (valueInPx / context.targetElementWidth) * 100;
-        } else if (context.propertyType === 'height' && context.targetElementHeight) {
-          convertedValue = (valueInPx / context.targetElementHeight) * 100;
-        } else if (context.propertyType === 'font-size') {
-          convertedValue = (valueInPx / parentFontSize) * 100;
-        } else {
-          // Default behavior - assume it's relative to parent font size
-          convertedValue = (valueInPx / parentFontSize) * 100;
-        }
-        break;
-      case "vh":
-        convertedValue = (valueInPx / viewportHeight) * 100;
-        break;
-      case "vw":
-        convertedValue = (valueInPx / viewportWidth) * 100;
-        break;
-      case "vmin":
-        convertedValue = (valueInPx / Math.min(viewportWidth, viewportHeight)) * 100;
-        break;
-      case "vmax":
-        convertedValue = (valueInPx / Math.max(viewportWidth, viewportHeight)) * 100;
-        break;
-      case "pt":
-        convertedValue = valueInPx / (96 / 72);
-        break;
-      case "pc":
-        convertedValue = valueInPx / (96 / 6);
-        break;
-      case "in":
-        convertedValue = valueInPx / 96;
-        break;
-      case "cm":
-        convertedValue = valueInPx / (96 / 2.54);
-        break;
-      case "mm":
-        convertedValue = valueInPx / (96 / 25.4);
-        break;
-      case "q":
-        convertedValue = valueInPx / (96 / 101.6);
-        break;
-      case "ex":
-        convertedValue = valueInPx / (parentFontSize * 0.5);
-        break;
-      case "ch":
-        convertedValue = valueInPx / (parentFontSize * 0.5);
-        break;
-      default:
-        convertedValue = valueInPx;
-    }
-    
-    // Format the value with appropriate decimal places
-    let precision = 2;
-    if (to === "px" || to === "pt" || to === "pc") {
-      precision = 0;
-    } else if (to === "in" || to === "cm" || to === "mm" || to === "q") {
-      precision = 3;
-    }
-    
-    // Format the value and remove trailing zeros
-    const formatted = convertedValue.toFixed(precision);
-    return formatted.replace(/\.0+$/, "").replace(/(\.\d+?)0+$/, "$1");
-  };
-  
-  
   const handleCssCodeChange = (value: string) => {
     setCssCode(value)
   }
@@ -218,10 +152,51 @@ const CssCodeConverter = () => {
     setToUnit(value as CssUnit)
   }
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(convertedCode)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(convertedCode)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch (error) {
+      // fallback for older browsers
+      const textarea = document.createElement("textarea")
+      textarea.value = convertedCode
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand("copy")
+      document.body.removeChild(textarea)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    }
+  }
+
+  // Copies DEFAULT_CSS_EXAMPLE to clipboard
+  const handleTryIt = async () => {
+    try {
+      await navigator.clipboard.writeText(DEFAULT_CSS_EXAMPLE)
+      setTried(true)
+      setTimeout(() => setTried(false), 1500)
+    } catch (error) {
+      // fallback for older browsers
+      const textarea = document.createElement("textarea")
+      textarea.value = DEFAULT_CSS_EXAMPLE
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand("copy")
+      document.body.removeChild(textarea)
+      setTried(true)
+      setTimeout(() => setTried(false), 1500)
+    }
+  }
+
+  const handleResetExample = () => {
+    setCssCode("")
+    setFromUnit("px")
+    setToUnit("rem")
+  }
+
+  const handleClearEditor = () => {
+    setCssCode("")
   }
 
   return (
@@ -231,50 +206,37 @@ const CssCodeConverter = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch flex-1">
-        <Card className="h-full bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
-          <CardContent className="p-6 flex flex-col flex-1 h-full">
-            <div className="mb-4">
-              <Label htmlFor="from-unit" className="text-sm font-medium mb-2 block text-zinc-600 dark:text-zinc-400">
-                From Unit
-              </Label>
-              <Select value={fromUnit} onValueChange={handleFromUnitChange}>
-                <SelectTrigger className="w-full bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200">
-                  <SelectValue placeholder="Select unit" />
-                </SelectTrigger>
-                <SelectContent className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200">
-                  {units.map((unit) => (
-                    <SelectItem key={`from-${unit}`} value={unit}>
-                      {unit}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex-1">
-              <CodeEditor
-                value={cssCode}
-                onChange={handleCssCodeChange}
-                placeholder="Paste your CSS code here..."
-                aria-label="CSS code to convert"
-                height="h-full"
-              />
-            </div>
-          </CardContent>
-        </Card>
 
-        <Card className="h-full bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch flex-1">
+        <Card className="h-full">
           <CardContent className="p-6 flex flex-col flex-1 h-full">
-            <div className="flex justify-between items-end mb-4">
-              <div className="w-[70%]">
-                <Label htmlFor="to-unit" className="text-sm font-medium mb-2 block text-zinc-600 dark:text-zinc-400">
-                  To Unit
+            <div className="mb-4 flex gap-4">
+              <div className="flex-1">
+                <Label className="text-sm font-medium mb-2 block">
+                  Convert From
+                </Label>
+                <Select value={fromUnit} onValueChange={handleFromUnitChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {units.map((unit) => (
+                      <SelectItem key={`from-${unit}`} value={unit}>
+                        {unit}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex-1">
+                <Label className="text-sm font-medium mb-2 block">
+                  Convert To
                 </Label>
                 <Select value={toUnit} onValueChange={handleToUnitChange}>
-                  <SelectTrigger className="w-full bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200">
-                    <SelectValue placeholder="Select unit" />
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200">
+                  <SelectContent>
                     {units.map((unit) => (
                       <SelectItem key={`to-${unit}`} value={unit}>
                         {unit}
@@ -283,17 +245,57 @@ const CssCodeConverter = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleCopy}
-                disabled={!convertedCode}
-                className="flex items-center gap-1 border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                aria-label="Copy converted CSS code"
-              >
-                {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                {copied ? "Copied" : "Copy"}
-              </Button>
+            </div>
+            <div className="flex-1">
+              <CodeEditor
+                value={cssCode}
+                readOnly={false}
+                onChange={handleCssCodeChange}
+                placeholder="Paste your CSS code here..."
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="h-full">
+          <CardContent className="p-6 flex flex-col flex-1 h-full">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-sm font-medium">
+                Converted CSS
+              </h3>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleTryIt}
+                  className="flex items-center gap-1"
+                  disabled={tried}
+                >
+                  {tried ? "Copied!" : "Try Example"}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleClearEditor}
+                  disabled={!convertedCode}
+                >
+                  Clear Editor
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopy}
+                  disabled={!convertedCode}
+                  className="flex items-center gap-1"
+                >
+                  {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                  {copied ? "Copied" : "Copy"}
+                </Button>
+                
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center mb-3">
             </div>
             <div className="relative flex-1">
               <CodeEditor
@@ -307,6 +309,11 @@ const CssCodeConverter = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* <div className="text-sm text-muted-foreground">
+        <p><strong>Note:</strong> Percentage and viewport unit conversions assume standard browser defaults.</p>
+        <p>Root font size is set to 16px for rem calculations.</p>
+      </div> */}
     </motion.div>
   )
 }

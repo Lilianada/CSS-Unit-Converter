@@ -22,7 +22,7 @@ export default function CodeEditor({
   placeholder = "Enter code...",
   readOnly = false,
   className = "",
-  height = "h-64",
+  height = "h-full",
   "aria-label": ariaLabel,
 }: CodeEditorProps) {
   const preRef = useRef<HTMLPreElement>(null)

@@ -9,6 +9,7 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import AboutDialog from "./about-dialog"
+import Image from "next/image";
 
 export default function Header() {
   const { theme, setTheme, resolvedTheme } = useTheme()
@@ -44,7 +45,7 @@ export default function Header() {
         <div className="hidden md:flex items-center gap-4">
           <Link href={isCodeConverter ? "/" : "/css-code-converter"}>
             <Button variant="outline" className="flex items-center gap-1 text-zinc-600 dark:text-zinc-300">
-              <span>{isCodeConverter ? "Unit Converter" : "Code Converter"}</span>
+              <span>{isCodeConverter ? "Switch to Unit Converter" : "Switch to Code Converter"}</span>
             </Button>
           </Link>
           <AboutDialog
@@ -85,7 +86,7 @@ export default function Header() {
                   className="flex items-center gap-2 px-3 py-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 cursor-pointer"
                 >
                   <SquareCode className="h-4 w-4" />
-                  {isCodeConverter ? "Unit Converter" : "Code Converter"}
+                  {isCodeConverter ? "Switch to Unit Converter" : "Switch to Code Converter"}
                 </Link>
               </DropdownMenu.Item>
               <DropdownMenu.Separator className="my-1 bg-zinc-200 dark:bg-zinc-800 h-px" />
