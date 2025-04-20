@@ -2,14 +2,14 @@ export default function CssUnitsConverter() {
   return (
     <div className="content-wrapper">
       <section>
-        <h1>Free CSS Unit Converter: Pixels to Rem, VW, and More | Lily's Lab</h1>
+        <h1>Free CSS Unit Converter: Pixels to Rem, VW, and More | Lily&apos;s Lab</h1>
         <p>
-          Effortlessly convert between CSS units with Lily's Lab's free and
+          Effortlessly convert between CSS units with Lily&apos;s Lab&apos;s free and
           accurate CSS Unit Converter. Instantly switch from pixels (px) to rem,
           viewport width (vw), viewport height (vh), and other relative and
           absolute CSS units. Perfect for web developers and designers seeking
           consistent, responsive layouts across all devices. Optimize your
-          website's design with precise CSS unit conversions.
+          website&apos;s design with precise CSS unit conversions.
         </p>
       </section>
 
@@ -33,11 +33,11 @@ export default function CssUnitsConverter() {
             pixels for accurate calculations.
           </li>
           <li>
-            <b>Convert:</b> Click the "Convert" button to instantly view the
+            <b>Convert:</b> Click the &quot;Convert&quot; button to instantly view the
             converted value.
           </li>
           <li>
-            <b>Copy:</b> Click the "Copy" button to easily copy the converted
+            <b>Copy:</b> Click the &quot;Copy&quot; button to easily copy the converted
             value to your clipboard.
           </li>
         </ol>
@@ -49,7 +49,7 @@ export default function CssUnitsConverter() {
           Accurate CSS unit conversions are crucial for building responsive,
           accessible, and visually appealing web designs. Our CSS converter
           supports essential units, ensuring your website adapts flawlessly
-          across various screen sizes and devices. Here's a quick guide to the
+          across various screen sizes and devices. Here&apos;s a quick guide to the
           most common CSS units:
         </p>
         <ul>
@@ -58,21 +58,21 @@ export default function CssUnitsConverter() {
             suitable for elements that require exact dimensions.
           </li>
           <li>
-            <b>Rems (rem):</b> Relative units based on the root HTML element's
+            <b>Rems (rem):</b> Relative units based on the root HTML element&apos;s
             font size, enabling scalable and maintainable designs. Ideal for
             defining font sizes and spacing that adapt proportionally.
           </li>
           <li>
             <b>Viewport Units (vw, vh, vmin, vmax):</b> Dynamic units based on
-            the browser's viewport size, perfect for creating full-width or
+            the browser&apos;s viewport size, perfect for creating full-width or
             full-height elements that scale responsively with the screen.
             <ul>
               <li>
-                <b>vw (Viewport Width):</b> Represents 1% of the viewport's
+                <b>vw (Viewport Width):</b> Represents 1% of the viewport&apos;s
                 width.
               </li>
               <li>
-                <b>vh (Viewport Height):</b> Represents 1% of the viewport's
+                <b>vh (Viewport Height):</b> Represents 1% of the viewport&apos;s
                 height.
               </li>
               <li>
