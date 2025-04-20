@@ -253,7 +253,7 @@ const CssCodeConverter = () => {
 
         <Card className="h-full">
           <CardContent className="p-6 flex flex-col flex-1 h-full">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-4 flex-wrap">
               <h3 className="text-sm font-medium">
                 Converted CSS
               </h3>
