@@ -9,7 +9,6 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import AboutDialog from "./about-dialog"
-import Image from "next/image";
 
 export default function Header() {
   const { theme, setTheme, resolvedTheme } = useTheme()
