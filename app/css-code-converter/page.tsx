@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Copy, Check, RotateCcw } from "lucide-react"
+import { Copy, Check } from "lucide-react"
 import { motion } from "framer-motion"
 import CodeEditor from "@/components/code-editor"
 
@@ -187,12 +187,6 @@ const CssCodeConverter = () => {
       setTried(true)
       setTimeout(() => setTried(false), 1500)
     }
-  }
-
-  const handleResetExample = () => {
-    setCssCode("")
-    setFromUnit("px")
-    setToUnit("rem")
   }
 
   const handleClearEditor = () => {
