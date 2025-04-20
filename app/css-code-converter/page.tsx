@@ -253,7 +253,7 @@ const CssCodeConverter = () => {
 
         <Card className="h-full">
           <CardContent className="p-6 flex flex-col flex-1 h-full">
-            <div className="flex justify-between items-center mb-4 flex-wrap">
+            <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
               <h3 className="text-sm font-medium">
                 Converted CSS
               </h3>
@@ -265,7 +265,7 @@ const CssCodeConverter = () => {
                   className="flex items-center gap-1"
                   disabled={tried}
                 >
-                  {tried ? "Copied!" : "Try Example"}
+                  {tried ? "Example Copied!" : "Try Example"}
                 </Button>
                 <Button
                   variant="outline"

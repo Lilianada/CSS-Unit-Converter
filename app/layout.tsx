@@ -94,6 +94,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <StructuredData />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"></meta>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
