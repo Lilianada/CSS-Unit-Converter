@@ -1,3 +1,45 @@
+export const metadata = {
+  title: "CSS Code Converter | LilysLab",
+  description: "Convert CSS code and units (px, em, rem, vw, %, etc.) instantly with LilysLab's advanced CSS code converter tool.",
+  keywords: [
+    "css code converter",
+    "css unit converter",
+    "convert css",
+    "px to rem",
+    "rem to em",
+    "css code conversion",
+    "responsive design"
+  ],
+  openGraph: {
+    title: "CSS Code Converter | LilysLab",
+    description: "Convert CSS code and units (px, em, rem, vw, %, etc.) instantly with LilysLab's advanced CSS code converter tool.",
+    url: "https://lilyslab.xyz/css-code-converter",
+    type: "website",
+    images: [
+      {
+        url: "/images/logo.png",
+        width: 1200,
+        height: 1200,
+        alt: "LilysLab CSS Code Converter logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CSS Code Converter | LilysLab",
+    description: "Convert CSS code and units (px, em, rem, vw, %, etc.) instantly with LilysLab's advanced CSS code converter tool.",
+    images: [
+      {
+        url: "/images/logo.png",
+        alt: "LilysLab CSS Code Converter logo",
+      },
+    ],
+  },
+  alternates: {
+    canonical: "https://lilyslab.xyz/css-code-converter",
+  },
+};
+
 "use client"
 
 import { useState, useEffect } from "react"
